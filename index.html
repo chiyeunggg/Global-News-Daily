@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>環球新聞日報</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Sans HK', 'PingFang HK', 'Microsoft JhengHei', sans-serif; background: #f4f4f0; color: #1a1a1a; line-height: 1.6; }
+  a { text-decoration: none; color: inherit; }
+
+  /* Header */
+  header { background: #1a1a2e; color: #fff; padding: 0; border-bottom: 3px solid #c8a84b; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; }
+  .site-title { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+  .site-title span { color: #c8a84b; }
+  .header-meta { font-size: 13px; color: #aaa; text-align: right; }
+  .header-meta .update-time { color: #c8a84b; font-weight: 600; }
+  nav { background: #111126; padding: 0 40px; display: flex; gap: 0; overflow-x: auto; }
+  nav a { color: #ccc; padding: 10px 18px; font-size: 13px; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; display: block; }
+  nav a:hover, nav a.active { color: #c8a84b; border-bottom-color: #c8a84b; }
+
+  /* Layout */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+  .grid-main { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+  @media (max-width: 900px) { .grid-main { grid-template-columns: 1fr; } }
+
+  /* Section headers */
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #1a1a2e; }
+  .section-flag { width: 4px; height: 20px; border-radius: 2px; }
+  .flag-global { background: #c8a84b; }
+  .flag-hk { background: #d63031; }
+  .flag-us { background: #0052a5; }
+  .flag-crypto { background: #f7931a; }
+  .flag-other { background: #6c5ce7; }
+  .section-title { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+  .section-icon { font-size: 18px; }
+
+  /* News cards */
+  .news-section { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 24px; border: 1px solid #e0e0d8; scroll-margin-top: 130px; }
+  .news-card { padding: 14px 0; border-bottom: 1px solid #f0f0ea; }
+  .news-card:last-child { border-bottom: none; padding-bottom: 0; }
+  .news-card:first-child { padding-top: 0; }
+  .news-rank { display: inline-block; background: #1a1a2e; color: #c8a84b; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+  .news-title-row { display: flex; align-items: flex-start; margin-bottom: 6px; }
+  .news-title { font-size: 15px; font-weight: 700; color: #1a1a2e; line-height: 1.4; }
+  .news-summary { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 6px; }
+  .news-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .tag-importance { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+  .tag-geo { background: #e8f4fd; color: #0c5b9e; border: 1px solid #90c9f0; }
+  .tag-reason { font-size: 12px; color: #888; font-style: italic; }
+
+  /* Sidebar */
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-card { background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #e0e0d8; }
+
+  /* Market summary */
+  .market-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f0f0ea; font-size: 13px; }
+  .market-row:last-child { border-bottom: none; }
+  .market-name { color: #555; }
+  .market-val { font-weight: 700; }
+
+  /* Other news list */
+  .other-news-cat { margin-bottom: 14px; }
+  .cat-label { font-size: 12px; font-weight: 700; color: #fff; background: #6c5ce7; padding: 2px 10px; border-radius: 10px; display: inline-block; margin-bottom: 8px; letter-spacing: 1px; }
+  .other-item { font-size: 13px; color: #333; padding: 4px 0; padding-left: 12px; border-left: 2px solid #e0e0d8; margin-bottom: 4px; line-height: 1.5; }
+
+  /* Ticker */
+  .ticker-bar { background: #1a1a2e; color: #c8a84b; padding: 6px 40px; font-size: 12px; overflow: hidden; white-space: nowrap; }
+  .ticker-content { display: inline-block; animation: ticker 120s linear infinite; }
+  @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+  /* Footer */
+  footer { background: #1a1a2e; color: #888; text-align: center; padding: 20px; font-size: 12px; margin-top: 40px; }
+  footer span { color: #c8a84b; }
+
+  .hk-card .news-rank { background: #8b0000; }
+  .us-card .news-rank { background: #003087; }
+  .crypto-card .news-rank { background: #c0610c; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="site-title">環球<span>新聞</span>日報</div>
+      <div style="font-size:12px; color:#aaa; margin-top:2px;">Global News Daily · Powered by AI Analysis</div>
+    </div>
+    <div class="header-meta">
+      <div style="font-size:13px;">2026年6月18日 星期四</div>
+      <div class="update-time">最後更新：美國收市後</div>
+      <div style="font-size:11px; margin-top:4px; color:#777;">資訊僅供參考，不構成投資建議</div>
+    </div>
+  </div>
+  <nav>
+    <a href="#global" class="active">🌐 全球頭條</a>
+    <a href="#hk">🇭🇰 香港新聞</a>
+    <a href="#us">🇺🇸 美國新聞</a>
+    <a href="#crypto">₿ 加密貨幣</a>
+    <a href="#other">📰 其他新聞</a>
+  </nav>
+</header>
+
+<div class="ticker-bar">
+  <div class="ticker-content" id="ticker-content">
+    🌐 特朗普與伊朗簽署初步協議　霍爾木茲海峽重開 &nbsp;&nbsp;|&nbsp;&nbsp; 🌐 聯儲局維持利率　九名官員預期年內加息 &nbsp;&nbsp;|&nbsp;&nbsp; 🌐 烏克蘭無人機大規模轟炸莫斯科煉油廠 &nbsp;&nbsp;|&nbsp;&nbsp; 🌐 美國防長赫格塞斯猛批北約盟友　倡建「北約3.0」 &nbsp;&nbsp;|&nbsp;&nbsp; 🌐 FIFA世界盃史上首次強制執行補水休息 &nbsp;&nbsp;|&nbsp;&nbsp; 🇭🇰 夏寶龍赴港視察北部都會區進展及五年規劃落實 &nbsp;&nbsp;|&nbsp;&nbsp; 🇭🇰 港府撥HK$300億啟動北部都會區開發 &nbsp;&nbsp;|&nbsp;&nbsp; 🇭🇰 醫管局即時解僱實習醫生　涉多宗嚴重專業失當 &nbsp;&nbsp;|&nbsp;&nbsp; 🇭🇰 東九龍智慧綠色大眾捷運系統7月招標 &nbsp;&nbsp;|&nbsp;&nbsp; 🇭🇰 65歲以上商用車司機擬強制驗身　明年中實施 &nbsp;&nbsp;|&nbsp;&nbsp; 🇺🇸 NPR民調：特朗普支持率跌至歷史新低 &nbsp;&nbsp;|&nbsp;&nbsp; 🇺🇸 「鱷魚惡島」拘留中心遷移所有被拘留者 &nbsp;&nbsp;|&nbsp;&nbsp; 🇺🇸 加沙地帶停火後再有逾千名巴勒斯坦人遇難 &nbsp;&nbsp;|&nbsp;&nbsp; 🇺🇸 奧巴馬總統圖書館盛大開幕典禮　星光熠熠 &nbsp;&nbsp;|&nbsp;&nbsp; 🇺🇸 特朗普政府斥資7.65億美元「買回」海上風電租約 &nbsp;&nbsp;|&nbsp;&nbsp; ₿ 比特幣徘徊$64,254　市場情緒中性偏淡 &nbsp;&nbsp;|&nbsp;&nbsp; ₿ 美伊協議帶動加密市場短暫反彈 &nbsp;&nbsp;|&nbsp;&nbsp; ₿ 伊利諾伊州預算案悄然加入數字資產0.2%稅 &nbsp;&nbsp;|&nbsp;&nbsp; ₿ 持幣者六月吸納逾12.5萬枚比特幣　底部訊號閃現 &nbsp;&nbsp;|&nbsp;&nbsp; ₿ 墨西哥億萬富翁力讚比特幣　勸妻按揭買幣 &nbsp;&nbsp;|&nbsp;&nbsp;
+  </div>
+</div>
+
+<div class="container">
+<div class="grid-main">
+
+  <!-- Main content -->
+  <div>
+
+    <!-- GLOBAL -->
+    <div id="global" class="news-section">
+      <div class="section-header">
+        <div class="section-flag flag-global"></div>
+        <div class="section-title">🌐 全球頭條新聞</div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank">1</span><span class="news-title">特朗普與伊朗簽署初步協議　霍爾木茲海峽重開</span></div>
+        <div class="news-summary">美國總統特朗普與伊朗就結束衝突簽署初步協議，協議允許伊朗恢復石油出口，並開啟長期核談判，同時緩解對伊朗的經濟制裁壓力。霍爾木茲海峽的重開被視為重大突破，對全球能源供應具深遠影響。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">💡 全球影響力</span>
+          <span class="tag tag-geo">🌍 全球</span>
+          <span class="tag-reason">直接影響全球油價及能源市場穩定性，具重大地緣政治意義。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank">2</span><span class="news-title">聯儲局維持利率　九名官員預期年內加息</span></div>
+        <div class="news-summary">新任聯儲局主席Kevin Warsh在首次政策公告中放棄前瞻指引，聯儲局維持利率不變，但19名決策者中有9人預期2026年底前將加息。Warsh強調防止通脹再現的優先性。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">📈 經濟影響</span>
+          <span class="tag tag-geo">🌎 全球</span>
+          <span class="tag-reason">聯儲局利率決策直接影響全球金融市場、股市及借貸成本。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank">3</span><span class="news-title">烏克蘭無人機大規模轟炸莫斯科煉油廠</span></div>
+        <div class="news-summary">烏克蘭無人機轟炸莫斯科一座煉油廠，造成設施受損並擾亂當地航空交通，據報是自俄羅斯入侵烏克蘭逾四年來對莫斯科最大規模的此類攻擊。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">⚠️ 突發事件</span>
+          <span class="tag tag-geo">🇷🇺 區域（歐洲）</span>
+          <span class="tag-reason">對俄羅斯能源基礎設施的重大攻擊，可能升級俄烏衝突局勢。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank">4</span><span class="news-title">美國防長赫格塞斯猛批北約盟友　倡建「北約3.0」</span></div>
+        <div class="news-summary">美國防長Pete Hegseth宣布將審查美軍在歐洲的部署，並強烈批評北約盟友的貢獻不足，呼籲重組聯盟。赫格塞斯將現有架構稱為過時，主張推動「北約3.0」改革。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🏛️ 政治重要性</span>
+          <span class="tag tag-geo">🌍 全球（跨大西洋）</span>
+          <span class="tag-reason">美國與盟友關係緊張可能重塑西方集體安全架構，影響深遠。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank">5</span><span class="news-title">FIFA世界盃史上首次強制執行補水休息</span></div>
+        <div class="news-summary">國際足聯宣布，為應對極端高溫威脅，2026年世界盃將強制所有比賽設補水休息時間，為世界盃歷史上首次實施此類規定。今屆世界盃由美國、加拿大及墨西哥聯合主辦。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🌡️ 環境發展</span>
+          <span class="tag tag-geo">🌎 全球</span>
+          <span class="tag-reason">體現氣候變化對全球體育賽事的實際影響，具重要政策示範意義。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HONG KONG -->
+    <div id="hk" class="news-section hk-card">
+      <div class="section-header">
+        <div class="section-flag flag-hk"></div>
+        <div class="section-title">🇭🇰 香港頭條新聞</div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#8b0000;">1</span><span class="news-title">夏寶龍赴港視察北部都會區進展及五年規劃落實</span></div>
+        <div class="news-summary">中央駐港最高官員夏寶龍訪港，重點視察香港北部都會區發展進度，並評估香港如何配合國家第十五個五年規劃。北部都會區是連接深港兩地的重大科創基地項目。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🏛️ 政治重要性</span>
+          <span class="tag tag-geo">🇭🇰 香港</span>
+          <span class="tag-reason">反映中央對香港政策落實的高度關注，具重要政治信號意義。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#8b0000;">2</span><span class="news-title">港府撥HK$300億啟動北部都會區開發</span></div>
+        <div class="news-summary">香港財政司司長陳茂波在最新預算案中，撥出300億港元（約38億美元）啟動北部都會區建設，包括河套香港園、新田科技城及洪水橋工業園各獲100億港元。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">📈 經濟影響</span>
+          <span class="tag tag-geo">🇭🇰 香港</span>
+          <span class="tag-reason">史上最大規模基建及科創投資之一，將重塑香港經濟結構。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#8b0000;">3</span><span class="news-title">醫管局即時解僱實習醫生　涉多宗嚴重專業失當</span></div>
+        <div class="news-summary">醫院管理局完成調查後即時解僱一名實習醫生，涉及多宗嚴重專業失當事件，包括未經授權進行醫療程序及侵入臨床數據庫。事件引發外界對醫院管理監督機制的關注。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🏥 社會</span>
+          <span class="tag tag-geo">🇭🇰 香港</span>
+          <span class="tag-reason">涉及公共醫療系統信任及病人安全，對醫管局監管制度影響重大。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#8b0000;">4</span><span class="news-title">東九龍智慧綠色大眾捷運系統7月招標</span></div>
+        <div class="news-summary">港府宣布東九龍智慧及綠色大眾捷運系統將於2026年7月正式招標，是香港推動智慧城市及低碳交通的重要里程碑，項目將連接東九龍多個主要地區。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🔧 基建</span>
+          <span class="tag tag-geo">🇭🇰 香港（九龍）</span>
+          <span class="tag-reason">香港重大基建及綠色交通轉型項目，影響區內居民出行。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#8b0000;">5</span><span class="news-title">65歲以上商用車司機擬強制驗身　明年中實施</span></div>
+        <div class="news-summary">港府計劃於明年中（2027年中）推行強制規定，要求65歲或以上的商用車輛司機接受定期身體檢查，以確保道路安全。措施旨在應對老齡化職業司機群體的健康風險。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🚗 公共安全</span>
+          <span class="tag tag-geo">🇭🇰 香港</span>
+          <span class="tag-reason">涉及公共道路安全及老齡化社會政策，影響大量商用車業界。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- US NEWS -->
+    <div id="us" class="news-section us-card">
+      <div class="section-header">
+        <div class="section-flag flag-us"></div>
+        <div class="section-title">🇺🇸 美國頭條新聞</div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#003087;">1</span><span class="news-title">NPR民調：特朗普支持率跌至歷史新低</span></div>
+        <div class="news-summary">根據美國全國公共廣播電台（NPR）最新民調，特朗普總統支持率跌至其執政以來歷史低位。分析師指，伊朗協議、北約爭議及國內政策分歧或是主因。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🏛️ 政治重要性</span>
+          <span class="tag tag-geo">🇺🇸 全國</span>
+          <span class="tag-reason">執政總統民望直接影響國會中期選舉走勢及政策推行能力。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#003087;">2</span><span class="news-title">「鱷魚惡島」拘留中心遷移所有被拘留者</span></div>
+        <div class="news-summary">國土安全部宣布，位於佛羅里達大沼澤地的「鱷魚惡島」拘留中心已將所有被拘留者轉移至其他設施，理由是颶風季節來臨帶來的安全隱患。該設施曾被視為特朗普移民政策的重要象徵。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🏛️ 政治重要性</span>
+          <span class="tag tag-geo">🇺🇸 全國</span>
+          <span class="tag-reason">特朗普政府移民政策的重大調整，影響數百名被拘留者命運。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#003087;">3</span><span class="news-title">加沙地帶停火後再有逾千名巴勒斯坦人遇難</span></div>
+        <div class="news-summary">加沙衛生部數據顯示，自去年十月以色列與哈馬斯達成停火協議以來，以色列在加沙的軍事行動已造成逾1,005名巴勒斯坦人死亡，國際社會對人道局勢的關注持續升溫。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">❤️ 人道主義</span>
+          <span class="tag tag-geo">🌍 全球（中東）</span>
+          <span class="tag-reason">持續的人道主義危機，美國作為調停方承受巨大外交壓力。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#003087;">4</span><span class="news-title">奧巴馬總統圖書館盛大開幕典禮　星光熠熠</span></div>
+        <div class="news-summary">奧巴馬總統圖書館及博物館正式舉行盛大開幕典禮，聚集大批政商名流及娛樂界人士。典禮標誌著奧巴馬遺產的重要里程碑，亦在特朗普執政背景下引起廣泛政治關注。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🎭 社會文化</span>
+          <span class="tag tag-geo">🇺🇸 全國</span>
+          <span class="tag-reason">重要歷史政治文化事件，在當前政治氣候下具特殊象徵意義。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#003087;">5</span><span class="news-title">特朗普政府斥資7.65億美元「買回」海上風電租約</span></div>
+        <div class="news-summary">特朗普政府宣布向Invenergy支付7.65億美元，換取後者放棄四個海上風電聯邦租約，涉及紐約灣、加州中部海岸及緬因灣等項目，是政府系統拆解可再生能源政策的最新舉措。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🌱 環境發展</span>
+          <span class="tag tag-geo">🇺🇸 全國</span>
+          <span class="tag-reason">大規模逆轉可再生能源政策，對美國清潔能源目標影響深遠。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRYPTO -->
+    <div id="crypto" class="news-section crypto-card">
+      <div class="section-header">
+        <div class="section-flag flag-crypto"></div>
+        <div class="section-title">₿ 加密貨幣新聞</div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#c0610c;">1</span><span class="news-title">比特幣徘徊$64,254　市場情緒中性偏淡</span></div>
+        <div class="news-summary">比特幣現報64,254美元，下跌2.28%；以太坊報1,741美元，下跌2.79%。技術指標顯示RSI值為41.92，市場情緒中性。分析師預計短期50日均線將下探71,783美元。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">📉 市場動態</span>
+          <span class="tag tag-geo">🌍 全球</span>
+          <span class="tag-reason">加密市場持續承壓，聯儲局鷹派立場及伊利諾伊州新稅制為主要利空因素。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#c0610c;">2</span><span class="news-title">美伊協議帶動加密市場短暫反彈</span></div>
+        <div class="news-summary">特朗普與伊朗簽署初步協議後，加密貨幣市場出現短暫反彈，但升幅受制於聯儲局維持利率及鷹派信號。風險資產整體表現受到抑制，比特幣未能維持漲幅。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🔗 宏觀關聯</span>
+          <span class="tag tag-geo">🌍 全球</span>
+          <span class="tag-reason">地緣政治緩和短期刺激風險資產，惟聯儲局政策抵銷升幅。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#c0610c;">3</span><span class="news-title">伊利諾伊州預算案悄然加入數字資產0.2%稅</span></div>
+        <div class="news-summary">伊利諾伊州在最新州預算案中，悄然加入對數字資產業務活動徵收0.2%稅項的條款，涵蓋所有數字資產的持有及轉移行為。加密行業對此強烈反彈，憂慮此例一開將引發其他州跟隨。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">📜 監管政策</span>
+          <span class="tag tag-geo">🇺🇸 伊利諾伊州</span>
+          <span class="tag-reason">美國州級加密稅制創立先例，可能引發業界出走及監管骨牌效應。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#c0610c;">4</span><span class="news-title">持幣者六月吸納逾12.5萬枚比特幣　底部訊號閃現</span></div>
+        <div class="news-summary">鏈上數據顯示，長期持幣者（HODLers）於本月累計吸納逾125,000枚比特幣，部分分析師視此為市場築底的潛在訊號。然而技術指標整體仍偏熊，市場分歧明顯。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">📊 鏈上分析</span>
+          <span class="tag tag-geo">🌍 全球</span>
+          <span class="tag-reason">大規模鏈上吸籌行為歷史上往往預示市場轉捩點，值得密切關注。</span>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="news-title-row"><span class="news-rank" style="background:#c0610c;">5</span><span class="news-title">墨西哥億萬富翁力讚比特幣　勸妻按揭買幣</span></div>
+        <div class="news-summary">身家約50億美元的墨西哥富商Ricardo Salinas Pliego公開表示，他曾勸說妻子以房產抵押貸款購入比特幣，並形容自己是比特幣的忠實信徒（Bitcoin Maximalist）。此言論在加密社群廣泛流傳。</div>
+        <div class="news-meta">
+          <span class="tag tag-importance">🎙️ 市場情緒</span>
+          <span class="tag tag-geo">🌎 拉丁美洲</span>
+          <span class="tag-reason">頂級富豪的極端看多言論反映加密市場在高淨值群體中的持續滲透。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER NEWS -->
+    <div id="other" class="news-section">
+      <div class="section-header">
+        <div class="section-flag flag-other"></div>
+        <div class="section-title">📰 其他重要新聞</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="other-news-cat">
+          <div class="cat-label">科技 &amp; AI</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 全球</span>AI正重塑全球體育運動管理，NBA及NFL已引入人工智能進行賽程安排及球隊策略分析。</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🇺🇸 美國</span>2026年世界盃觸發美國史上最大規模青少年足球投資潮，科技企業藉此進軍體育產業。</div>
+        </div>
+        <div class="other-news-cat">
+          <div class="cat-label">商業 &amp; 經濟</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 全球</span>全球體育科技市場規模達188.5億美元，預計2030年前將急增至617.2億美元。</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 全球</span>私募股權及機構投資者持續增持全球足球俱樂部及美國各大體育聯盟股權。</div>
+        </div>
+        <div class="other-news-cat">
+          <div class="cat-label" style="background:#00b894;">環境</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🇺🇸 美國</span>特朗普政府斥資7.65億美元向Invenergy購回四個海上風電租約，清潔能源政策大幅倒退。</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 全球</span>FIFA世界盃因極端高溫首次強制補水休息，凸顯氣候變化對國際體育的實際衝擊。</div>
+        </div>
+        <div class="other-news-cat">
+          <div class="cat-label" style="background:#d63031;">體育</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌎 北美</span>2026年FIFA世界盃由美國、加拿大及墨西哥聯合主辦，賽事規模為歷屆之最。</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 全球</span>沉浸式數字球迷體驗成為各大體育聯盟重點投資方向，融合直播、電競及博彩功能。</div>
+        </div>
+        <div class="other-news-cat">
+          <div class="cat-label" style="background:#0984e3;">香港（延伸）</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🇭🇰 香港</span>香港首個五年規劃公眾諮詢展開，強調「有為政府」與「高效市場」結合，深化大灣區融合。</div>
+        </div>
+        <div class="other-news-cat">
+          <div class="cat-label" style="background:#6c5ce7;">社會</div>
+          <div class="other-item"><span class="tag tag-geo" style="font-size:10px; margin-right:6px;">🌍 中東</span>加沙停火後人道局勢持續惡化，逾千名巴勒斯坦人死亡，國際救援機構敦促立即介入。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <!-- Key events today -->
+    <div class="sidebar-card">
+      <div style="font-size:13px; font-weight:700; color:#1a1a2e; margin-bottom:12px; letter-spacing:1px;">📌 今日要點速覽</div>
+      <div class="market-row">
+        <span class="market-name">🕊️ 美伊協議</span>
+        <span class="market-val" style="color:#00b894; font-size:12px;">初步達成</span>
+      </div>
+      <div class="market-row">
+        <span class="market-name">🏦 聯儲局利率</span>
+        <span class="market-val" style="font-size:12px;">維持不變</span>
+      </div>
+      <div class="market-row">
+        <span class="market-name">⚡ 烏克蘭無人機</span>
+        <span class="market-val" style="color:#d63031; font-size:12px;">轟炸莫斯科</span>
+      </div>
+      <div class="market-row">
+        <span class="market-name">🇭🇰 夏寶龍訪港</span>
+        <span class="market-val" style="font-size:12px;">視察北都區</span>
+      </div>
+      <div class="market-row">
+        <span class="market-name">⚽ 世界盃</span>
+        <span class="market-val" style="font-size:12px;">強制補水休息</span>
+      </div>
+      <div class="market-row">
+        <span class="market-name">🌀 特朗普民望</span>
+        <span class="market-val" style="color:#d63031; font-size:12px;">歷史新低</span>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="sidebar-card" style="background:#f8f8f4;">
+      <div style="font-size:12px; color:#888; line-height:1.7;">
+        <strong style="color:#1a1a2e;">關於本網站</strong><br>
+        本站每日於美國收市後更新，由AI新聞分析系統根據重要性標準篩選並整理全球要聞，涵蓋全球、香港、美國、加密貨幣等版塊。<br><br>
+        <span style="color:#d63031;">⚠ 免責聲明：</span>所有內容均為資訊參考，不構成投資、法律或其他專業建議。
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div>© 2026 <span>環球新聞日報</span> · 每日美國收市後更新 · AI輔助新聞整理</div>
+  <div style="margin-top:6px;">資料來源：NPR、SCMP、CoinDesk、ABC News、The Block、RTHK 等國際媒體</div>
+</footer>
+
+</body>
+</html>
