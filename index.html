@@ -163,6 +163,13 @@
       <div id="market"></div>
     </div>
 
+    <div class="sidebar-card" id="visits-card" hidden>
+      <div class="sidebar-head">👥 訪客統計</div>
+      <div class="market-row"><span class="market-name">今日訪客</span><span class="market-val" id="visits-today">—</span></div>
+      <div class="market-row"><span class="market-name">累計訪客</span><span class="market-val" id="visits-total">—</span></div>
+      <div style="font-size:11px; color:#999; margin-top:6px;" id="visits-note"></div>
+    </div>
+
     <div class="sidebar-card" style="background:#f8f8f4;">
       <div style="font-size:12px; color:#888; line-height:1.7;">
         <strong style="color:#1a1a2e;">關於本網站</strong><br>
@@ -691,7 +698,9 @@
   function src(list){return '<div class="news-src">來源：'+list.map(function(p){return '<a href="'+esc(p[1])+'" target="_blank" rel="noopener">'+esc(p[0])+'</a>'}).join('')+'</div>';}
 
   /* header */
-  document.getElementById('hdr-date').textContent = D.dateLabel;
+  /* 第一行：訪客當地今日日期 */
+  var now = new Date(), WD = ['日','一','二','三','四','五','六'];
+  document.getElementById('hdr-date').textContent = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（星期'+WD[now.getDay()]+'）';
   document.getElementById('hdr-update').textContent = '最後更新：' + D.updated;
 
   /* nav: same order as original site */
@@ -761,6 +770,30 @@
     else byId[id].stories.forEach(function(st){st.src.forEach(function(p){names[p[0].replace(/（.*）/,'')]=1;});});
   });
   document.getElementById('foot-src').textContent = '資料來源：' + Object.keys(names).join('、');
+})();
+</script>
+<script>
+/* 訪客統計（GoatCounter）：填入 GoatCounter 代號後啟用 */
+(function(){
+  var GC_CODE = '';
+  if(!GC_CODE) return;
+  var base = 'https://' + GC_CODE + '.goatcounter.com';
+  var t = document.createElement('script');
+  t.async = true; t.src = 'https://gc.zgo.at/count.js';
+  t.setAttribute('data-goatcounter', base + '/count');
+  document.body.appendChild(t);
+  var card = document.getElementById('visits-card');
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function get(q){ return fetch(base + '/counter/TOTAL.json' + q).then(function(r){ if(!r.ok) throw r.status; return r.json(); }); }
+  var d = new Date(), today = d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+  get('').then(function(j){
+    document.getElementById('visits-total').textContent = String(j.count).indexOf(',')>-1 ? j.count : fmt(j.count);
+    card.hidden = false;
+    return get('?start=' + today);
+  }).then(function(j){
+    document.getElementById('visits-today').textContent = String(j.count).indexOf(',')>-1 ? j.count : fmt(j.count);
+  }).catch(function(){});
+  document.getElementById('visits-note').textContent = '由 2026年9月27日 起計；同一訪客同日重複瀏覽只計一次。';
 })();
 </script>
 </body>
