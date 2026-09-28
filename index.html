@@ -770,7 +770,7 @@
   /* 相片裁切：直身相（多為人像）預設對準上方，避免切走個頭；JSON 可用 img.pos 指定焦點 */
   Array.prototype.forEach.call(document.querySelectorAll('.top-photo img'), function(img){
     if(img.getAttribute('data-pos')) return;
-    function fit(){ if(img.naturalHeight > img.naturalWidth * 0.9) img.style.objectPosition = 'center 8%'; }
+    function fit(){ if(img.naturalHeight > img.naturalWidth * 0.9) img.style.objectPosition = 'center 12%'; }
     if(img.complete && img.naturalWidth) fit(); else img.addEventListener('load', fit);
   });
 
