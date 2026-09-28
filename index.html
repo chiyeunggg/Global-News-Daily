@@ -749,7 +749,7 @@
     return '<div id="'+id+'" class="news-section '+m.cls+'"><div class="section-header"><div class="section-flag '+m.flag+'"></div><div class="section-title">'+m.icon+' '+m.title+'</div></div>'+
       s.stories.map(function(st,i){
         var top = i===0, pic = top && st.img;
-        return '<div class="news-card'+(top?' top-story':'')+(top&&!pic?' no-img':'')+'">'+(pic?'<figure class="top-photo"><img src="'+esc(st.img.src)+'" alt="'+esc(st.img.cap)+'" loading="lazy"><figcaption>'+esc(st.img.cap)+'（'+'<a href="'+esc(st.img.link)+'" target="_blank" rel="noopener">'+esc(st.img.credit)+'</a>，'+esc(st.img.license)+'）</figcaption></figure>':'')+(top?'<div class="top-text">':'')+'<div class="news-title-row"><span class="news-title">'+esc(st.h)+'</span></div>'+
+        return '<div class="news-card'+(top?' top-story':'')+(top&&!pic?' no-img':'')+'">'+(pic?'<figure class="top-photo"><img src="'+esc(st.img.src)+'" alt="'+esc(st.img.cap)+'" loading="lazy"'+(st.img.pos?' data-pos="'+esc(st.img.pos)+'" style="object-position:'+esc(st.img.pos)+'"':'')+'><figcaption>'+esc(st.img.cap)+'（'+'<a href="'+esc(st.img.link)+'" target="_blank" rel="noopener">'+esc(st.img.credit)+'</a>，'+esc(st.img.license)+'）</figcaption></figure>':'')+(top?'<div class="top-text">':'')+'<div class="news-title-row"><span class="news-title">'+esc(st.h)+'</span></div>'+
           '<div class="news-summary">'+esc(st.s)+'</div>'+
           '<div class="news-meta"><span class="tag tag-importance">'+catIcon(st.cat)+' '+esc(st.cat)+'</span><span class="tag tag-geo">'+geoIcon(st.geo)+' '+esc(st.geo)+'</span><span class="tag-reason">'+esc(st.why)+'</span></div>'+
           src(st.src)+(top?'</div>':'')+'</div>';
@@ -767,6 +767,12 @@
     }).join('')+'</div></div>';
 
   document.getElementById('main').innerHTML = storySection('global')+storySection('hk')+storySection('us')+storySection('crypto')+otherHtml;
+  /* 相片裁切：直身相（多為人像）預設對準上方，避免切走個頭；JSON 可用 img.pos 指定焦點 */
+  Array.prototype.forEach.call(document.querySelectorAll('.top-photo img'), function(img){
+    if(img.getAttribute('data-pos')) return;
+    function fit(){ if(img.naturalHeight > img.naturalWidth * 0.9) img.style.objectPosition = 'center 8%'; }
+    if(img.complete && img.naturalWidth) fit(); else img.addEventListener('load', fit);
+  });
 
   /* footer sources */
   var names = {};
