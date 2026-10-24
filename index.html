@@ -167,6 +167,10 @@
       <div class="sidebar-head">👥 到訪人次</div>
       <img id="visits-badge" alt="今日 / 累計到訪人次" style="display:block; max-width:100%; height:20px;" src="https://hits.sh/chiyeunggg.github.io/Global-News-Daily.svg?view=today-total&amp;label=%E4%BB%8A%E6%97%A5%20%2F%20%E7%B4%AF%E8%A8%88%E5%88%B0%E8%A8%AA&amp;labelColor=1a1a2e&amp;color=c8a84b">
       <div style="font-size:11px; color:#999; margin-top:6px;">左為今日、右為累計人次；每次打開網頁計一次，由 2026年10月24日 起計。</div>
+      <div class="sidebar-head" style="margin-top:14px;">🧑 獨立訪客</div>
+      <div class="market-row"><span class="market-name">今日獨立訪客</span><span class="market-val" id="uv-today">—</span></div>
+      <div class="market-row"><span class="market-name">累計獨立訪客</span><span class="market-val" id="uv-total">—</span></div>
+      <div style="font-size:11px; color:#999; margin-top:6px;">同一訪客重複瀏覽只計一次（香港時間計日），由 2026年10月24日 起計。</div>
     </div>
 
     <div class="sidebar-card" style="background:#f8f8f4;">
@@ -749,6 +753,23 @@
     else byId[id].stories.forEach(function(st){st.src.forEach(function(p){names[p[0].replace(/（.*）/,'')]=1;});});
   });
   document.getElementById('foot-src').textContent = '資料來源：' + Object.keys(names).join('、');
+})();
+</script>
+<script>
+/* 獨立訪客（GoatCounter） */
+(function(){
+  var base = 'https://globalnewsdaily.goatcounter.com';
+  var t = document.createElement('script');
+  t.async = true; t.src = 'https://gc.zgo.at/count.js';
+  t.setAttribute('data-goatcounter', base + '/count');
+  document.body.appendChild(t);
+  var hk = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Hong_Kong', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
+  function show(id, q){
+    fetch(base + '/counter/TOTAL.json' + q).then(function(r){ return r.json(); })
+      .then(function(j){ document.getElementById(id).textContent = j.count; })
+      .catch(function(){});
+  }
+  setTimeout(function(){ show('uv-total', ''); show('uv-today', '?start=' + hk); }, 1500);
 })();
 </script>
 </body>
