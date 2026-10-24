@@ -755,6 +755,7 @@
   document.getElementById('foot-src').textContent = '資料來源：' + Object.keys(names).join('、');
 })();
 </script>
+<script>/* 統計時忽略網址後面的 ?參數，所有到訪歸入同一頁 */ window.goatcounter = {path: function(p){ return location.pathname; }};</script>
 <script data-goatcounter="https://globalnewsdaily.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script>
 /* 獨立訪客（GoatCounter）：顯示人數 */
