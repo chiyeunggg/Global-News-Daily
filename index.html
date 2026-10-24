@@ -766,7 +766,9 @@
       .then(function(j){ document.getElementById(id).textContent = j.count; })
       .catch(function(){});
   }
-  setTimeout(function(){ show('uv-total', ''); show('uv-today', '?start=' + hk); }, 1500);
+  /* 用日期參數取數（無參數的結果會被長時間快取） */
+  var tmr = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Hong_Kong', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date(Date.now() + 864e5));
+  setTimeout(function(){ show('uv-total', '?start=2026-10-01&end=' + tmr); show('uv-today', '?start=' + hk + '&end=' + tmr); }, 1500);
 })();
 </script>
 </body>
