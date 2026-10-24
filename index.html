@@ -755,14 +755,11 @@
   document.getElementById('foot-src').textContent = '資料來源：' + Object.keys(names).join('、');
 })();
 </script>
+<script data-goatcounter="https://globalnewsdaily.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script>
-/* 獨立訪客（GoatCounter） */
+/* 獨立訪客（GoatCounter）：顯示人數 */
 (function(){
   var base = 'https://globalnewsdaily.goatcounter.com';
-  var t = document.createElement('script');
-  t.async = true; t.src = 'https://gc.zgo.at/count.js';
-  t.setAttribute('data-goatcounter', base + '/count');
-  document.body.appendChild(t);
   var hk = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Hong_Kong', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
   function show(id, q){
     fetch(base + '/counter/TOTAL.json' + q).then(function(r){ return r.json(); })
